@@ -33,7 +33,7 @@ class Algo extends AbstractScript
 
     public function help(): void
     {
-        $help = new Help('...');
+        $help = new Help('algo');
         $help->addArgument('y', 'year', 'Year to solve', true, true);
         $help->addArgument('d', 'day', 'Day to solve', true, true);
         $help->addArgument('e', 'example', 'Example Only', false, false);
