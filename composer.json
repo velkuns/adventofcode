@@ -1,0 +1,32 @@
+{
+  "name": "velkuns/adventofcode",
+  "description": "CLI Application for adventofcode.com challenges",
+  "type": "project",
+  "minimum-stability": "stable",
+  "license": "MIT",
+
+  "authors": [
+    {
+      "name": "Romain Cottard",
+      "role": "Developer"
+    }
+  ],
+
+  "autoload": {
+    "psr-4": {
+      "Application\\": "./src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Application\\": "./src"
+    }
+  },
+
+  "require": {
+    "ext-json":"*",
+
+    "eureka/kernel-console": "^5.0",
+    "eureka/component-console": "^5.0"
+  }
+}
