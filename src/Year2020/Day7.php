@@ -84,7 +84,7 @@ class Day7 implements AlgorithmInterface
     }
 
     /**
-     * *  : Your puzzle answer was xxx.
+     * *  : Your puzzle answer was <354.
      * ** : Your puzzle answer was xxx.
      */
     public function solve(string $star, array $inputs): string
@@ -103,7 +103,6 @@ class Day7 implements AlgorithmInterface
         $count = 0;
         foreach ($data as $color => $contains) {
             $count += $this->resolve('shiny gold', $color, $contains, $data, 0);
-            //echo PHP_EOL;
         }
 
         return $count;
@@ -111,37 +110,20 @@ class Day7 implements AlgorithmInterface
 
     private function resolve(string $search, string $color, ?array $contains, array $data, int $depth): int
     {
-        //echo str_pad($color, 20) . ' > ';
-        static $cache = [];
-
-        if (isset($cache[$color])) {
-            //echo "${cache[$color]}";
-            return $cache[$color];
-        }
-
-        $cache[$color] = 0;
-
         if ($search === $color || $contains === null) {
-            //echo "${cache[$color]}";
-            return $cache[$color];
+            return 0;
         }
 
         if (in_array($search, $contains)) {
-            $cache[$color] = 1;
-            //echo "${cache[$color]}";
-            return $cache[$color];
+            return 1;
         }
 
         $count = 0;
         foreach ($contains as $subColor) {
             $count += $this->resolve($search, $subColor, $data[$subColor], $data, $depth + 1);
-            //echo PHP_EOL;
-            //echo str_repeat(str_pad(' ', 20) . ' > ', $depth + 1);
         }
 
-        $cache[$color] = $count >= 1 ? 1 : 0;
-        //echo "${cache[$color]}";
-        return $cache[$color];
+        return ($count >= 1 ? 1 : 0);
     }
 
     private function parseInput(string $input): array
@@ -158,7 +140,7 @@ class Day7 implements AlgorithmInterface
             }
 
             $tmp = explode(' ', $item);
-            [$prefix, $suffix] = array_splice($tmp, 1, 3);
+            [$prefix, $suffix] = array_splice($tmp, 1, 2);
             $contains[] = $prefix . ' ' . $suffix;
         }
 

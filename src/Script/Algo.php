@@ -28,7 +28,10 @@ class Algo extends AbstractScript
         $this->setExecutable();
         $this->setDescription('Execute Advent Of Code Algorithm!');
 
-        $this->config = ['2020' => __DIR__ . '/../../data/2020'];
+        $this->config = [
+            '2020' => __DIR__ . '/../../data/2020',
+            '2021' => __DIR__ . '/../../data/2021',
+        ];
     }
 
     public function help(): void
