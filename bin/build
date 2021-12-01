@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+ROOT_DIR="$( cd "$(dirname "$0")/.." && pwd )"
+
+docker build --tag adventofcode --file ${ROOT_DIR}/Dockerfile ${ROOT_DIR}

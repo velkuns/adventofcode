@@ -60,7 +60,17 @@ class Day7 implements AlgorithmInterface
         $examples = [
             '*'  => [
                 [
-                    0 => [],
+                    4 => [
+                        'light red bags contain 1 bright white bag, 2 muted yellow bags.',
+                        'dark orange bags contain 3 bright white bags, 4 muted yellow bags.',
+                        'bright white bags contain 1 shiny gold bag.',
+                        'muted yellow bags contain 2 shiny gold bags, 9 faded blue bags.',
+                        'shiny gold bags contain 1 dark olive bag, 2 vibrant plum bags.',
+                        'dark olive bags contain 3 faded blue bags, 4 dotted black bags.',
+                        'vibrant plum bags contain 5 faded blue bags, 6 dotted black bags.',
+                        'faded blue bags contain no other bags.',
+                        'dotted black bags contain no other bags.',
+                    ],
                 ]
             ],
             '**' => [
@@ -84,7 +94,78 @@ class Day7 implements AlgorithmInterface
 
     private function starOne(array $inputs): int
     {
-        return 0;
+        $data = [];
+        foreach ($inputs as $input) {
+            [$color, $contains] = $this->parseInput($input);
+            $data[$color] = $contains;
+        }
+
+        $count = 0;
+        foreach ($data as $color => $contains) {
+            $count += $this->resolve('shiny gold', $color, $contains, $data, 0);
+            //echo PHP_EOL;
+        }
+
+        return $count;
+    }
+
+    private function resolve(string $search, string $color, ?array $contains, array $data, int $depth): int
+    {
+        //echo str_pad($color, 20) . ' > ';
+        static $cache = [];
+
+        if (isset($cache[$color])) {
+            //echo "${cache[$color]}";
+            return $cache[$color];
+        }
+
+        $cache[$color] = 0;
+
+        if ($search === $color || $contains === null) {
+            //echo "${cache[$color]}";
+            return $cache[$color];
+        }
+
+        if (in_array($search, $contains)) {
+            $cache[$color] = 1;
+            //echo "${cache[$color]}";
+            return $cache[$color];
+        }
+
+        $count = 0;
+        foreach ($contains as $subColor) {
+            $count += $this->resolve($search, $subColor, $data[$subColor], $data, $depth + 1);
+            //echo PHP_EOL;
+            //echo str_repeat(str_pad(' ', 20) . ' > ', $depth + 1);
+        }
+
+        $cache[$color] = $count >= 1 ? 1 : 0;
+        //echo "${cache[$color]}";
+        return $cache[$color];
+    }
+
+    private function parseInput(string $input): array
+    {
+        $return = ['color' => '', 'contains' => []];
+
+        [$color, $tmp] = explode(' bags contain ', $input);
+        $output   = explode(', ', $tmp);
+        $contains = [];
+        foreach ($output as $item) {
+            if ($item === 'no other bags.') {
+                $contains = null;
+                continue;
+            }
+
+            $tmp = explode(' ', $item);
+            [$prefix, $suffix] = array_splice($tmp, 1, 3);
+            $contains[] = $prefix . ' ' . $suffix;
+        }
+
+        $return['color']    = $color;
+        $return['contains'] = $contains;
+
+        return array_values($return);
     }
 
     private function starTwo(array $inputs): int
