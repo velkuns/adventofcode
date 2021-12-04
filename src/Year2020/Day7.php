@@ -75,7 +75,26 @@ class Day7 implements AlgorithmInterface
             ],
             '**' => [
                 [
-                    0 => [],
+                    32 => [
+                        'light red bags contain 1 bright white bag, 2 muted yellow bags.',
+                        'dark orange bags contain 3 bright white bags, 4 muted yellow bags.',
+                        'bright white bags contain 1 shiny gold bag.',
+                        'muted yellow bags contain 2 shiny gold bags, 9 faded blue bags.',
+                        'shiny gold bags contain 1 dark olive bag, 2 vibrant plum bags.',
+                        'dark olive bags contain 3 faded blue bags, 4 dotted black bags.',
+                        'vibrant plum bags contain 5 faded blue bags, 6 dotted black bags.',
+                        'faded blue bags contain no other bags.',
+                        'dotted black bags contain no other bags.',
+                    ],
+                    126 => [
+                        'shiny gold bags contain 2 dark red bags.',
+                        'dark red bags contain 2 dark orange bags.',
+                        'dark orange bags contain 2 dark yellow bags.',
+                        'dark yellow bags contain 2 dark green bags.',
+                        'dark green bags contain 2 dark blue bags.',
+                        'dark blue bags contain 2 dark violet bags.',
+                        'dark violet bags contain no other bags.',
+                    ],
                 ]
             ],
         ];
@@ -84,7 +103,7 @@ class Day7 implements AlgorithmInterface
     }
 
     /**
-     * *  : Your puzzle answer was <354.
+     * *  : Your puzzle answer was 348.
      * ** : Your puzzle answer was xxx.
      */
     public function solve(string $star, array $inputs): string
@@ -93,6 +112,22 @@ class Day7 implements AlgorithmInterface
     }
 
     private function starOne(array $inputs): int
+    {
+        $data = [];
+        foreach ($inputs as $input) {
+            [$color, $contains] = $this->parseInput($input);
+            $data[$color] = $contains;
+        }
+
+        $count = 0;
+        foreach ($data as $color => $contains) {
+            $count += $this->resolve('shiny gold', $color, $contains, $data, 0);
+        }
+
+        return $count;
+    }
+
+    private function starTwo(array $inputs): int
     {
         $data = [];
         foreach ($inputs as $input) {
@@ -128,8 +163,6 @@ class Day7 implements AlgorithmInterface
 
     private function parseInput(string $input): array
     {
-        $return = ['color' => '', 'contains' => []];
-
         [$color, $tmp] = explode(' bags contain ', $input);
         $output   = explode(', ', $tmp);
         $contains = [];
@@ -140,18 +173,10 @@ class Day7 implements AlgorithmInterface
             }
 
             $tmp = explode(' ', $item);
-            [$prefix, $suffix] = array_splice($tmp, 1, 2);
-            $contains[] = $prefix . ' ' . $suffix;
+            [$qty, $prefix, $suffix] = array_splice($tmp, 0, 3);
+            $contains[] = ['color' => $prefix . ' ' . $suffix, 'qty' => $qty];
         }
 
-        $return['color']    = $color;
-        $return['contains'] = $contains;
-
-        return array_values($return);
-    }
-
-    private function starTwo(array $inputs): int
-    {
-        return 0;
+        return [$color, $contains];
     }
 }

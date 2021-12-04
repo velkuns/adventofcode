@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) Deezer
+ * Copyright (c) Romain Cottard
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -40,6 +40,7 @@ class Algo extends AbstractScript
         $help->addArgument('y', 'year', 'Year to solve', true, true);
         $help->addArgument('d', 'day', 'Day to solve', true, true);
         $help->addArgument('e', 'example', 'Example Only', false, false);
+        $help->addArgument('f', 'functional', 'Activate Algo in functional programming style', false, false);
         $help->display();
     }
 
@@ -72,11 +73,13 @@ class Algo extends AbstractScript
         $yellow = (new Style())->colorForeground(Color::YELLOW);
         $cyan   = (new Style())->colorForeground(Color::CYAN);
 
-        Out::std($white->setText('------------------------------------------ EXAMPLES ------------------------------------------'));
+        $functionalSuffix = $arguments->has('f', 'functional') ? ' (FUNCTIONAL)' : '';
+
+        Out::std($white->setText('------------------------------------------ EXAMPLES ' . $functionalSuffix . ' ------------------------------------------'));
         foreach (['*', '**'] as $star) {
             foreach ($solver->getExamples($star) as $data) {
                 foreach ($data as $expected => $inputs) {
-                    Out::std($yellow->setText($star) . ':  ' . $cyan->setText($solver->solve($star, $inputs)) . ' - expected: ' . $expected);
+                    Out::std($yellow->setText(str_pad($star, 2)) . ':  ' . $cyan->setText($solver->solve($star, $inputs, $arguments->has('f', 'functional'))) . ' - expected: ' . $expected);
                 }
             }
         }
@@ -85,9 +88,9 @@ class Algo extends AbstractScript
         $inputs = array_map('trim', $inputs); // remove trailing chars
 
         if (!$arguments->has('e', 'example')) {
-            Out::std($white->setText('------------------------------------------- OUTPUT -------------------------------------------'));
-            Out::std($yellow->setText('*') . '  : ' . $cyan->setText($solver->solve('*', $inputs)));
-            Out::std($yellow->setText('**') . ' : ' . $cyan->setText($solver->solve('**', $inputs)));
+            Out::std($white->setText('------------------------------------------- OUTPUT ' . $functionalSuffix . ' -------------------------------------------'));
+            Out::std($yellow->setText('*') . ' : ' . $cyan->setText($solver->solve('*', $inputs, $arguments->has('f', 'functional'))));
+            Out::std($yellow->setText('**') . ': ' . $cyan->setText($solver->solve('**', $inputs, $arguments->has('f', 'functional'))));
         }
     }
 }
