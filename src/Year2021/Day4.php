@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace Application\Year2021;
 
 use Application\Common\AlgorithmInterface;
-use Application\Pipeline\Pipeline;
 
 /**
  * Class Day4
@@ -52,7 +51,7 @@ class Day4 implements AlgorithmInterface
                 ]],
             ],
             '**' => [
-                [4512 => [
+                [1924 => [
                     '7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1',
                     '',
                     '22 13 17 11  0',
@@ -110,6 +109,25 @@ class Day4 implements AlgorithmInterface
 
     private function starTwo(array $inputs): int
     {
+        $numbers = array_map('intval', explode(',', array_shift($inputs)));
+        $grids   = $this->parseGrids($inputs);
+
+        $winningGrids = array_fill(0, count($grids), 0);
+        foreach ($numbers as $number) {
+            $isLast = (array_sum($winningGrids) === count($grids) - 1);
+            foreach ($grids as $gridNumber => $grid) {
+                $isBingo = $grid->check($number);
+
+                if ($isLast && $isBingo && $winningGrids[$gridNumber] === 0) {
+                    return $grid->solve($number);
+                }
+
+                if ($isBingo) {
+                    $winningGrids[$gridNumber] = 1;
+                }
+            }
+        }
+
         return 0;
     }
 
@@ -133,7 +151,9 @@ class Day4 implements AlgorithmInterface
                         $line[$number] = 1;
                         $isBingo = (array_sum($line) === 5);
                         for ($i = 0, $max = count($line); $i < $max; $i++) {
-                            $isBingo = $isBingo || (array_sum(array_column($this->lines, $i)) === 5);
+                            $noIndexedLines = array_map(fn($currentLine) => array_values($currentLine), $this->lines);
+                            $columns = array_column($noIndexedLines, $i);
+                            $isBingo = $isBingo || (array_sum($columns) === 5);
                         }
 
                         return $isBingo;
@@ -141,6 +161,17 @@ class Day4 implements AlgorithmInterface
                 }
 
                 return false;
+            }
+
+            public function display(?array $grid = null): void
+            {
+                $grid = $grid ?? $this->lines;
+                foreach ($grid as $line) {
+                    echo implode(' ', $line) . PHP_EOL;
+                }
+                foreach ($grid as $line) {
+                    echo implode(' ', array_keys($line)) . PHP_EOL;
+                }
             }
 
             public function solve(int $number): int
