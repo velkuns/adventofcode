@@ -7,10 +7,6 @@
  * file that was distributed with this source code.
  */
 
-/*
-
- */
-
 declare(strict_types=1);
 
 namespace Application\Year2021;
@@ -78,10 +74,6 @@ class Day4 implements AlgorithmInterface
         return $examples[$star];
     }
 
-    /**
-     * *  : Your puzzle answer was 3882564.
-     * ** : Your puzzle answer was 3385170.
-     */
     public function solve(string $star, array $inputs, bool $functionalMode = false): string
     {
         if (!$functionalMode) {

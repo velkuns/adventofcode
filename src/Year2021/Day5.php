@@ -7,10 +7,6 @@
  * file that was distributed with this source code.
  */
 
-/*
-
- */
-
 declare(strict_types=1);
 
 namespace Application\Year2021;
@@ -61,10 +57,6 @@ class Day5 implements AlgorithmInterface
         return $examples[$star];
     }
 
-    /**
-     * *  : Your puzzle answer was 7318.
-     * ** : Your puzzle answer was xxxxx.
-     */
     public function solve(string $star, array $inputs, bool $functionalMode = false): string
     {
         if (!$functionalMode) {
@@ -115,23 +107,56 @@ class Day5 implements AlgorithmInterface
             }
         });
 
-        for ($y = 0; $y < 10; $y++) {
+        /*for ($y = 0; $y < 10; $y++) {
             for ($x = 0; $x < 10; $x++) {
                 echo ($map["$x.$y"] ?? '.');
             }
             echo PHP_EOL;
-        }
+        }*/
 
         return count(array_filter($map, fn($val) => $val > 1));
     }
 
+    public function vec2map(array $map, array $vector): array
+    {
+        $x    = (int) $vector['s'][0];
+        $y    = (int) $vector['s'][1];
+        $endX = (int) $vector['e'][0];
+        $endY = (int) $vector['e'][1];
+        $map["$x.$y"] = ($map["$x.$y"] ?? 0) + 1;
+        while($x !== $endX || $y !== $endY) {
+            $x += ((int) ($x !== $endX)) * ($x > $endX ? -1 : +1);
+            $y += ((int) ($y !== $endY)) * ($y > $endY ? -1 : +1);
+            $map["$x.$y"] = ($map["$x.$y"] ?? 0) + 1;
+        }
+
+        return $map;
+    }
+
     private function starOneFunctional(array $inputs): int
     {
-        return 0;
+        return (int) (new Pipeline())
+            ->array($inputs)
+                ->map(fn($line) => explode(' -> ', $line))
+                ->map(fn($line) => ['s' => explode(',', $line[0]), 'e' => explode(',', $line[1])])
+                ->filter(fn($vector) => $vector['s'][0] === $vector['e'][0] || $vector['s'][1] === $vector['e'][1])
+                ->reduce([$this, 'vec2map'], [])
+                ->filter(fn($val) => $val > 1)
+                ->count()
+            //->int()
+            ->get();
     }
 
     private function starTwoFunctional(array $inputs): int
     {
-        return 0;
+        return (int) (new Pipeline())
+            ->array($inputs)
+                ->map(fn($line) => explode(' -> ', $line))
+                ->map(fn($line) => ['s' => explode(',', $line[0]), 'e' => explode(',', $line[1])])
+                ->reduce([$this, 'vec2map'], [])
+                ->filter(fn($val) => $val > 1)
+                ->count()
+            //->int()
+            ->get();
     }
 }

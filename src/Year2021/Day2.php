@@ -99,10 +99,6 @@ class Day2 implements AlgorithmInterface
         return $examples[$star];
     }
 
-    /**
-     * *  : Your puzzle answer was 1693300.
-     * ** : Your puzzle answer was 1857958050.
-     */
     public function solve(string $star, array $inputs, bool $functionalMode = false): string
     {
         if (!$functionalMode) {

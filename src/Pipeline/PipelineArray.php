@@ -20,6 +20,11 @@ class PipelineArray
         $this->input = $input;
     }
 
+    public function count(): PipelineInt
+    {
+        return $this->int(count($this->input));
+    }
+
     public function sum(): PipelineInt
     {
         return $this->int(array_sum($this->input));

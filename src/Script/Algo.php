@@ -72,6 +72,7 @@ class Algo extends AbstractScript
         $white  = (new Style())->bold();
         $yellow = (new Style())->colorForeground(Color::YELLOW);
         $cyan   = (new Style())->colorForeground(Color::CYAN);
+        $red    = (new Style())->colorForeground(Color::RED);
 
         $functionalSuffix = $arguments->has('f', 'functional') ? ' (FUNCTIONAL)' : '';
 
@@ -88,9 +89,16 @@ class Algo extends AbstractScript
         $inputs = array_map('trim', $inputs); // remove trailing chars
 
         if (!$arguments->has('e', 'example')) {
+            $timeOneStar  = -microtime(true);
+            $solveOneStar = $solver->solve('*', $inputs, $arguments->has('f', 'functional'));
+            $timeOneStar  = '[' . round($timeOneStar + microtime(true), 5) . 's]';
+            $timeTwoStar  = -microtime(true);
+            $solveTwoStar = $solver->solve('**', $inputs, $arguments->has('f', 'functional'));
+            $timeTwoStar  = '[' . round($timeTwoStar + microtime(true), 5) . 's]';
+
             Out::std($white->setText('------------------------------------------- OUTPUT ' . $functionalSuffix . ' -------------------------------------------'));
-            Out::std($yellow->setText('*') . ' : ' . $cyan->setText($solver->solve('*', $inputs, $arguments->has('f', 'functional'))));
-            Out::std($yellow->setText('**') . ': ' . $cyan->setText($solver->solve('**', $inputs, $arguments->has('f', 'functional'))));
+            Out::std($yellow->setText('*') . ' : ' . $cyan->setText($solveOneStar) . ' - ' . $red->setText($timeOneStar));
+            Out::std($yellow->setText('**') . ': ' . $cyan->setText($solveTwoStar) . ' - ' . $red->setText($timeTwoStar));
         }
     }
 }

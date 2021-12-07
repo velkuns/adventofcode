@@ -83,10 +83,6 @@ class Day1 implements AlgorithmInterface
         return $examples[$star];
     }
 
-    /**
-     * *  : Your puzzle answer was 1832.
-     * ** : Your puzzle answer was 9210402.
-     */
     public function solve(string $star, array $inputs): string
     {
         return (string) ($star === '*' ? $this->starOne($inputs) : $this->starTwo($inputs));
