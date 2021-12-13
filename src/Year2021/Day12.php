@@ -45,16 +45,12 @@ class Day12 implements AlgorithmInterface
 
     private function starOne(array $inputs): int
     {
-        $graph = $this->getGraph($inputs);
-
-        return $this->countPaths($graph, 'start', false);
+        return $this->countPaths($this->getGraph($inputs), 'start', false);
     }
 
     private function starTwo(array $inputs): int
     {
-        $graph = $this->getGraph($inputs);
-
-        return $this->countPaths($graph, 'start', true);
+        return $this->countPaths($this->getGraph($inputs), 'start', true);
     }
 
     private function getGraph(array $inputs): array
