@@ -25,6 +25,11 @@ class PipelineArray
         return $this->int(count($this->input));
     }
 
+    public function countValues(): PipelineArray
+    {
+        return $this->array(array_count_values($this->input));
+    }
+
     public function sum(): PipelineInt
     {
         return $this->int(array_sum($this->input));
@@ -40,9 +45,9 @@ class PipelineArray
         return $this->newPipe(array_map($callback, $this->input));
     }
 
-    public function filter(callable $callback): self
+    public function filter(callable $callback, int $mode = 0): self
     {
-        return $this->newPipe(array_filter($this->input, $callback));
+        return $this->newPipe(array_filter($this->input, $callback, $mode));
     }
 
     public function slice(int $offset, ?int $length = null): PipelineArray
@@ -53,5 +58,26 @@ class PipelineArray
     public function reduce(callable $callable, $init)
     {
         return $this->newPipe(array_reduce($this->input, $callable, $init));
+    }
+
+    public function walk(callable $callable, $arg = null): PipelineArray
+    {
+        array_walk($this->input, $callable, $arg);
+
+        return $this;
+    }
+
+    public function sort(): PipelineArray
+    {
+        sort($this->input);
+
+        return $this;
+    }
+
+    public function rsort(): PipelineArray
+    {
+        rsort($this->input);
+
+        return $this;
     }
 }
