@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace Application\Algorythm\BinaryTree;
+namespace Application\Trigonometry\BinaryTree;
 
 /**
  * Class Snailfish

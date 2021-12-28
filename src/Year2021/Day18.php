@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Application\Year2021;
 
-use Application\Algorythm\BinaryTree\Snailfish;
+use Application\Trigonometry\BinaryTree\Snailfish;
 use Application\Common\AlgorithmInterface;
 
 /**
