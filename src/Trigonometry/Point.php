@@ -46,19 +46,21 @@ class Point
 
     public function rotateOnAxis(string $axis, float $angle): Point
     {
+        $angleRad = deg2rad($angle);
+
         $x = $this->x;
         $y = $this->y;
         $z = $this->z;
 
         if ($axis === 'x') {
-            $y = $this->y * cos($angle) + $this->z * -sin($angle);
-            $z = $this->y * sin($angle) + $this->z * cos($angle);
+            $y = $this->y * cos($angleRad) + $this->z * -sin($angleRad);
+            $z = $this->y * sin($angleRad) + $this->z * cos($angleRad);
         } elseif ($axis === 'y') {
-            $x = $this->x * cos($angle) + $this->z * sin($angle);
-            $z = $this->x * -sin($angle) + $this->z * cos($angle);
+            $x = $this->x * cos($angleRad) + $this->z * sin($angleRad);
+            $z = $this->x * -sin($angleRad) + $this->z * cos($angleRad);
         } else {
-            $x = $this->x * cos($angle) + $this->y * sin($angle);
-            $y = $this->x * -sin($angle) + $this->y * cos($angle);
+            $x = $this->x * cos($angleRad) + $this->y * sin($angleRad);
+            $y = $this->x * -sin($angleRad) + $this->y * cos($angleRad);
         }
 
         return new Point((int) $x, (int) $y, (int) $z);

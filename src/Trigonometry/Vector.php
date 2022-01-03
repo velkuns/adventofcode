@@ -65,7 +65,7 @@ class Vector
 
     public function rotateOnAxis(string $axis, float $angle): Vector
     {
-        $p1 = $this->origin->rotateOnAxis($axis,$angle);
+        $p1 = $this->origin->rotateOnAxis($axis, $angle);
         $p2 = $this->destination->rotateOnAxis($axis, $angle);
 
         return new self($p1, $p2);

@@ -219,8 +219,8 @@ class Day19 implements AlgorithmInterface
         $vectors1 = $vectors[0];
         unset($vectors[0]);
 
-        while (!empty($vectors1)) {
-            for ($zone2 = 1; $zone2 < $max; $zone2++) {
+        while (!empty($vectors)) {
+            for ($zone2 = 0; $zone2 < $max; $zone2++) {
                 if ($zone2 === $zone1 || in_array($zone2, $zones)) {
                     continue; // already compared or is the same zone
                 }
@@ -231,14 +231,17 @@ class Day19 implements AlgorithmInterface
                 if (count($commonVectors) < 12) {
                     continue;
                 }
+                echo "scanner #$zone1 overlaps scanner #$zone2 (\$zones: " . implode(',', $zones) . ")\n";
 
                 $zones[] = $zone2;
 
                 //~ re-orientate beacons position in zone 2.
                 $orientation = $this->getOrientation($commonVectors);
+                echo "Orientation: " . var_export($orientation, true) . PHP_EOL;
                 $translation = $this->getTranslationVector($commonVectors, $orientation);
 
                 $mapBeacons = $this->orientateAndTranslate($mapBeacons, $beacons[$zone2], $orientation, $translation);
+                $vectors2   = $this->createVectors($beacons[$zone2]);
 
                 unset($vectors[$zone2]);
                 $vectors1 = $vectors2;
@@ -259,23 +262,31 @@ class Day19 implements AlgorithmInterface
     private function beaconsToVectors(array $beacons): array
     {
         $vectors = [];
-        $treated = [];
         foreach ($beacons as $scanner => $positions) {
-            $max = count($positions);
-            for ($o = 0; $o < $max; $o++) {
-                $p1 = $positions[$o];
-                for ($d = 0; $d < $max; $d++) {
-                    if ($o === $d || isset($treated["$scanner.$o.$d"]) || isset($treated["$scanner.$d.$o"])) {
-                        continue;
-                    }
-                    $treated["$scanner.$o.$d"] = 1;
-                    $treated["$scanner.$d.$o"] = 1;
+            $vectors[$scanner] = $this->createVectors($positions);
+        }
 
-                    $p2 = $positions[$d];
+        return $vectors;
+    }
 
-                    $vector = new Vector($p1, $p2);
-                    $vectors[$scanner][spl_object_id($vector)] = $vector;
+    private function createVectors(array $beacons): array
+    {
+        $vectors = [];
+        $max     = count($beacons);
+
+        for ($o = 0; $o < $max; $o++) {
+            $p1 = $beacons[$o];
+            for ($d = 0; $d < $max; $d++) {
+                if ($o === $d || isset($treated["$o.$d"]) || isset($treated["$d.$o"])) {
+                    continue;
                 }
+                $treated["$o.$d"] = 1;
+                $treated["$d.$o"] = 1;
+
+                $p2 = $beacons[$d];
+
+                $vector = new Vector($p1, $p2);
+                $vectors[spl_object_id($vector)] = $vector;
             }
         }
 
@@ -320,6 +331,10 @@ class Day19 implements AlgorithmInterface
     private function getOrientation(array $vectors): array
     {
         //~ Search for the same scanner orientation
+        /**
+         * @var Vector $v1
+         * @var Vector $v2
+         */
         [$v1, $v2] = array_values(array_shift($vectors));
 
         $axis     = 'x';
@@ -330,13 +345,13 @@ class Day19 implements AlgorithmInterface
                 $isMirror = false;
                 $v = $v2->rotateOnAxis($axis, $angle);
                 if ($v->isSameAs($v1)) {
-                    break;
+                    break 2;
                 }
 
                 $v = $v->mirrorOnAxis($axis);
                 if ($v->isSameAs($v1)) {
                     $isMirror = true;
-                    break;
+                    break 2;
                 }
             }
         }
@@ -350,6 +365,7 @@ class Day19 implements AlgorithmInterface
         array $orientation,
         Vector $translation
     ): array {
+
         foreach ($beacons as $index => $beacon) {
             if ($orientation['angle'] > 0) {
                 $beacon = $beacon->rotateOnAxis($orientation['axis'], $orientation['angle']);
