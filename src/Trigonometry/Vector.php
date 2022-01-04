@@ -63,6 +63,14 @@ class Vector
         return $this->destination;
     }
 
+    public function add(Vector $v): self
+    {
+        $p1 = $this->origin();
+        $p2 = $this->destination()->translate($v);
+
+        return new Vector($p1, $p2, false);
+    }
+
     public function rotateOnAxis(string $axis, float $angle): Vector
     {
         $p1 = $this->origin->rotateOnAxis($axis, $angle);
@@ -87,6 +95,15 @@ class Vector
     public function size(): float
     {
         return sqrt($this->squareSize());
+    }
+
+    public function manhattanDistance(): int
+    {
+        return
+            ($this->destination->getX() - $this->origin->getX()) +
+            ($this->destination->getY() - $this->origin->getY()) +
+            ($this->destination->getZ() - $this->origin->getZ())
+        ;
     }
 
     public function __toString(): string

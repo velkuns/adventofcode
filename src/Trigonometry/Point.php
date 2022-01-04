@@ -53,26 +53,17 @@ class Point
         $z = $this->z;
 
         if ($axis === 'x') {
-            $y = $this->y * cos($angleRad) + $this->z * -sin($angleRad);
-            $z = $this->y * sin($angleRad) + $this->z * cos($angleRad);
+            $y = $this->y * round(cos($angleRad)) + $this->z * round(-sin($angleRad));
+            $z = $this->y * round(sin($angleRad)) + $this->z * round(cos($angleRad));
         } elseif ($axis === 'y') {
-            $x = $this->x * cos($angleRad) + $this->z * sin($angleRad);
-            $z = $this->x * -sin($angleRad) + $this->z * cos($angleRad);
+            $x = $this->x * round(cos($angleRad)) + $this->z * round(sin($angleRad));
+            $z = $this->x * round(-sin($angleRad)) + $this->z * round(cos($angleRad));
         } else {
-            $x = $this->x * cos($angleRad) + $this->y * sin($angleRad);
-            $y = $this->x * -sin($angleRad) + $this->y * cos($angleRad);
+            $x = $this->x * round(cos($angleRad)) + $this->y * round(sin($angleRad));
+            $y = $this->x * round(-sin($angleRad)) + $this->y * round(cos($angleRad));
         }
 
         return new Point((int) $x, (int) $y, (int) $z);
-    }
-
-    public function mirrorOnAxis(string $axis): Point
-    {
-        $x = $axis === 'x' ? -$this->x : $this->x;
-        $y = $axis === 'y' ? -$this->y : $this->y;
-        $z = $axis === 'z' ? -$this->z : $this->z;
-
-        return new Point($x, $y, $z);
     }
 
     public function translate(Vector $vector): Point
