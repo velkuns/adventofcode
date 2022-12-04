@@ -6,3 +6,4 @@ parameters:
   year:
     2020: '/data/2020'
     2021: '/data/2021'
+    2022: '/data/2022'

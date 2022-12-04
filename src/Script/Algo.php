@@ -31,6 +31,7 @@ class Algo extends AbstractScript
         $this->config = [
             '2020' => __DIR__ . '/../../data/2020',
             '2021' => __DIR__ . '/../../data/2021',
+            '2022' => __DIR__ . '/../../data/2022',
         ];
     }
 
