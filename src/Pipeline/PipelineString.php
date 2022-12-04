@@ -16,7 +16,13 @@ class PipelineString
     use PipelineTrait;
 
     private array $allowedMethods = [
-        'trim', 'explode'
+        'haystack_first' => [
+            'trim',
+            'str_split',
+        ],
+        'haystack_last' => [
+            'explode',
+        ]
     ];
 
     public function __construct($input)
@@ -24,17 +30,32 @@ class PipelineString
         $this->input = $input;
     }
 
-    public function __call(string $name, array $args)
+    public function __call(string $name, array $args): PipelineInt|Pipeline|PipelineBool|PipelineArray|PipelineFloat|PipelineString
     {
-        if (!in_array($name, $this->allowedMethods)) {
-            return $this;
+        if (in_array($name, $this->allowedMethods['haystack_first'])) {
+            return $this->useHaystackFirst($name, $args);
         }
 
+        if (in_array($name, $this->allowedMethods['haystack_last'])) {
+            return $this->useHaystackLast($name, $args);
+        }
+
+        throw new \LogicException('function currently not supported!');
+    }
+
+    private function useHaystackFirst(string $name, array $args): PipelineInt|Pipeline|PipelineBool|PipelineArray|PipelineFloat|PipelineString
+    {
         //~ Put input as first argument.
-        array_unshift($this->input, $args);
+        array_unshift($args, $this->input);
 
-        $input = call_user_func_array($name, array_merge($args));
+        return $this->newPipe(call_user_func_array($name, $args));
+    }
 
-        return $this;
+    private function useHaystackLast(string $name, array $args): PipelineInt|Pipeline|PipelineBool|PipelineArray|PipelineFloat|PipelineString
+    {
+        //~ Put input as first argument.
+        $args[] = $this->input;
+
+        return $this->newPipe(call_user_func_array($name, $args));
     }
 }

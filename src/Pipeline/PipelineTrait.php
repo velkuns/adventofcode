@@ -13,8 +13,7 @@ namespace Application\Pipeline;
 
 trait PipelineTrait
 {
-    /** @var mixed $input */
-    protected $input;
+    protected mixed $input;
 
     public function array(?array $input): PipelineArray
     {
@@ -46,7 +45,7 @@ trait PipelineTrait
         return $this->newPipe(Store::get($name));
     }
 
-    public function store(string $name)
+    public function store(string $name): self
     {
         Store::set($name, $this->input);
 
@@ -58,29 +57,27 @@ trait PipelineTrait
         return $this->array(Store::getMany(...$names));
     }
 
-    /**
-     * @return mixed
-     */
-    public function get()
+    public function get(): mixed
     {
         return $this->input;
     }
 
-    protected function newPipe($input)
+    public function debug(): self
     {
-        switch (true) {
-            case is_string($input):
-                return new PipelineString($input);
-            case is_array($input):
-                return new PipelineArray($input);
-            case is_int($input):
-                return new PipelineInt($input);
-            case is_float($input):
-                return new PipelineFloat($input);
-            case is_bool($input):
-                return new PipelineBool($input);
-            default:
-                return new Pipeline($input);
-        }
+        var_export($this->input);
+
+        return $this;
+    }
+
+    protected function newPipe($input): PipelineFloat|PipelineString|PipelineBool|PipelineArray|PipelineInt|Pipeline
+    {
+        return match (true) {
+            is_string($input) => new PipelineString($input),
+            is_array($input)  => new PipelineArray($input),
+            is_int($input)    => new PipelineInt($input),
+            is_float($input)  => new PipelineFloat($input),
+            is_bool($input)   => new PipelineBool($input),
+            default           => new Pipeline($input),
+        };
     }
 }

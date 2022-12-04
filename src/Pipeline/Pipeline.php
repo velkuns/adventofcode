@@ -20,13 +20,10 @@ class Pipeline
 {
     use PipelineTrait;
 
-    private array $instances;
-
-    public function __construct(array $instances = [])
+    public function __construct(bool $flushStore = true)
     {
-        $this->instances = $instances;
-
-        Store::flush();
+        if ($flushStore === true) {
+            Store::flush();
+        }
     }
-
 }

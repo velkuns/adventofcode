@@ -45,6 +45,11 @@ class PipelineArray
         return $this->newPipe(array_map($callback, $this->input));
     }
 
+    public function max(): PipelineInt
+    {
+        return $this->int((int) max($this->input));
+    }
+
     public function filter(callable $callback, int $mode = 0): self
     {
         return $this->newPipe(array_filter($this->input, $callback, $mode));
@@ -55,29 +60,54 @@ class PipelineArray
         return $this->array(array_slice($this->input, $offset, $length));
     }
 
-    public function reduce(callable $callable, $init)
+    public function reduce(callable $callable, $init): PipelineInt|Pipeline|PipelineBool|PipelineArray|PipelineFloat|PipelineString
     {
         return $this->newPipe(array_reduce($this->input, $callable, $init));
     }
 
-    public function walk(callable $callable, $arg = null): PipelineArray
+    public function walk(callable $callable, $arg = null): static
     {
         array_walk($this->input, $callable, $arg);
 
         return $this;
     }
 
-    public function sort(): PipelineArray
+    public function chunk(int $length): PipelineArray
+    {
+        return $this->array(array_chunk($this->input, $length));
+    }
+
+    public function unique(): PipelineArray
+    {
+        return $this->array(array_unique($this->input));
+    }
+
+    public function intersect(): PipelineArray
+    {
+        return $this->array(array_intersect(...$this->input));
+    }
+
+    public function current(): PipelineInt|Pipeline|PipelineBool|PipelineArray|PipelineFloat|PipelineString
+    {
+        return $this->newPipe(current($this->input));
+    }
+
+    public function sort(): static
     {
         sort($this->input);
 
         return $this;
     }
 
-    public function rsort(): PipelineArray
+    public function rsort(): static
     {
         rsort($this->input);
 
         return $this;
+    }
+
+    public function each(): PipelineEach
+    {
+        return new PipelineEach($this->input);
     }
 }
