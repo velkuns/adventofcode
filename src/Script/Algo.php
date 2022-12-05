@@ -90,16 +90,18 @@ class Algo extends AbstractScript
         $inputs = array_map('trim', $inputs); // remove trailing chars
 
         if (!$arguments->has('e', 'example')) {
-            $timeOneStar  = -microtime(true);
-            $solveOneStar = $solver->solve('*', $inputs, $arguments->has('f', 'functional'));
-            $timeOneStar  = '[' . round($timeOneStar + microtime(true), 5) . 's]';
-            $timeTwoStar  = -microtime(true);
-            $solveTwoStar = $solver->solve('**', $inputs, $arguments->has('f', 'functional'));
-            $timeTwoStar  = '[' . round($timeTwoStar + microtime(true), 5) . 's]';
+            $timeOneStar   = -microtime(true);
+            $solveOneStar  = $solver->solve('*', $inputs, $arguments->has('f', 'functional'));
+            $timeOneStar   = '[' . round($timeOneStar + microtime(true), 5) . 's]';
+            $memoryOneStar = '[' . round(memory_get_peak_usage() / 1024 / 1024, 1) . 'MB]';
+            $timeTwoStar   = -microtime(true);
+            $solveTwoStar  = $solver->solve('**', $inputs, $arguments->has('f', 'functional'));
+            $timeTwoStar   = '[' . round($timeTwoStar + microtime(true), 5) . 's]';
+            $memoryTwoStar = '[' . round(memory_get_peak_usage() / 1024 / 1024, 1) . 'MB]';
 
             Out::std($white->setText('------------------------------------------- OUTPUT ' . $functionalSuffix . ' -------------------------------------------'));
-            Out::std($yellow->setText('*') . ' : ' . $cyan->setText($solveOneStar) . ' - ' . $red->setText($timeOneStar));
-            Out::std($yellow->setText('**') . ': ' . $cyan->setText($solveTwoStar) . ' - ' . $red->setText($timeTwoStar));
+            Out::std($yellow->setText('*') . ' : ' . $cyan->setText($solveOneStar) . ' - ' . $red->setText($timeOneStar) . ' - ' . $yellow->setText($memoryOneStar));
+            Out::std($yellow->setText('**') . ': ' . $cyan->setText($solveTwoStar) . ' - ' . $red->setText($timeTwoStar) . ' - ' . $yellow->setText($memoryTwoStar));
         }
     }
 }
