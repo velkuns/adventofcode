@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Application\Year2022;
 
 use Application\Common\AlgorithmInterface;
-use Application\Pipeline\Pipeline;
 
 class Day5 implements AlgorithmInterface
 {
