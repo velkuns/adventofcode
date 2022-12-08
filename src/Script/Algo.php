@@ -33,6 +33,8 @@ class Algo extends AbstractScript
             '2021' => __DIR__ . '/../../data/2021',
             '2022' => __DIR__ . '/../../data/2022',
         ];
+
+        Argument::getInstance()->add('color', true);
     }
 
     public function help(): void
