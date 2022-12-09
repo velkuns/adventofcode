@@ -191,7 +191,11 @@ class Day9 implements AlgorithmInterface
             $output .= "\n";
         }
         Out::std($output);
-        //fscanf(STDIN, '%s', $input);
-        usleep(100_000);
+        if (Argument::getInstance()->has('draw-by-step')) {
+            //~ Wait for input before continue process
+            fscanf(STDIN, '%s', $input);
+        } else {
+            usleep(100_000);
+        }
     }
 }
