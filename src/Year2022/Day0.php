@@ -11,59 +11,17 @@ declare(strict_types=1);
 
 namespace Application\Year2022;
 
-use Application\Common\AlgorithmInterface;
-use Application\Pipeline\Pipeline;
+use Application\Common\Day;
 
-class Day0 implements AlgorithmInterface
+class Day0 extends Day
 {
-    public function getExamples(string $star): array
-    {
-        $examples = [
-            '*'  => [
-                [0 => ['a', 'b', 'c']]
-            ],
-            '**' => [
-                [1 => ['a', 'b', 'c']]
-            ],
-        ];
-
-        return $examples[$star];
-    }
-
-    public function solve(string $star, array $inputs, bool $isFunctional = false): string
-    {
-        if ($isFunctional) {
-            return (string) ($star === '*' ? $this->starOneFunctional($inputs) : $this->starTwoFunctional($inputs));
-        } else {
-            return (string) ($star === '*' ? $this->starOne($inputs) : $this->starTwo($inputs));
-        }
-    }
-
-    private function starOne(array $inputs): int
+    protected function starOne(array $inputs): int
     {
         return 0;
     }
 
-    private function starTwo(array $inputs): int
+    protected function starTwo(array $inputs): int
     {
         return 0;
-    }
-
-    private function starOneFunctional(array $inputs): int
-    {
-        return (int) (new Pipeline())
-            ->array($inputs)
-            ->int(0)
-            ->get()
-        ;
-    }
-
-    private function starTwoFunctional(array $inputs): int
-    {
-        return (int) (new Pipeline())
-            ->array($inputs)
-            ->int(0)
-            ->get()
-        ;
     }
 }

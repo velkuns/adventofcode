@@ -42,8 +42,8 @@ class Algo extends AbstractScript
         $help = new Help('algo');
         $help->addArgument('y', 'year', 'Year to solve', true, true);
         $help->addArgument('d', 'day', 'Day to solve', true, true);
-        $help->addArgument('e', 'example', 'Example Only', false, false);
-        $help->addArgument('f', 'functional', 'Activate Algo in functional programming style', false, false);
+        $help->addArgument('e', 'example', 'Example Only');
+        $help->addArgument('f', 'functional', 'Activate Algo in functional programming style');
         $help->display();
     }
 
@@ -79,11 +79,17 @@ class Algo extends AbstractScript
 
         $functionalSuffix = $arguments->has('f', 'functional') ? ' (FUNCTIONAL)' : '';
 
-        Out::std($white->setText('------------------------------------------ EXAMPLES ' . $functionalSuffix . ' ------------------------------------------'));
+        $line = str_repeat('-', 42);
+        Out::std($white->setText("$line EXAMPLES $functionalSuffix $line"));
         foreach (['*', '**'] as $star) {
-            foreach ($solver->getExamples($star) as $data) {
+            $examples = $this->getExamples($year, $day, $star);
+            foreach ($examples ?? $solver->getExamples($star) as $data) {
                 foreach ($data as $expected => $inputs) {
-                    Out::std($yellow->setText(str_pad($star, 2)) . ':  ' . $cyan->setText($solver->solve($star, $inputs, $arguments->has('f', 'functional'))) . ' - expected: ' . $expected);
+                    $answer = $solver->solve($star, $inputs, $arguments->has('f', 'functional'));
+                    Out::std(
+                        $yellow->setText(str_pad($star, 2)) . ':  ' .
+                        $cyan->setText($answer) . ' - expected: ' . $expected
+                    );
                 }
             }
         }
@@ -101,9 +107,43 @@ class Algo extends AbstractScript
             $timeTwoStar   = '[' . round($timeTwoStar + microtime(true), 5) . 's]';
             $memoryTwoStar = '[' . round(memory_get_peak_usage() / 1024 / 1024, 1) . 'MB]';
 
-            Out::std($white->setText('------------------------------------------- OUTPUT ' . $functionalSuffix . ' -------------------------------------------'));
-            Out::std($yellow->setText('*') . ' : ' . $cyan->setText($solveOneStar) . ' - ' . $red->setText($timeOneStar) . ' - ' . $yellow->setText($memoryOneStar));
-            Out::std($yellow->setText('**') . ': ' . $cyan->setText($solveTwoStar) . ' - ' . $red->setText($timeTwoStar) . ' - ' . $yellow->setText($memoryTwoStar));
+            Out::std($white->setText("$line OUTPUT $functionalSuffix $line"));
+            Out::std(
+                $yellow->setText('*') . ' : ' .
+                $cyan->setText($solveOneStar) . ' - ' .
+                $red->setText($timeOneStar) . ' - ' .
+                $yellow->setText($memoryOneStar)
+            );
+            Out::std(
+                $yellow->setText('**') . ': ' .
+                $cyan->setText($solveTwoStar) . ' - ' .
+                $red->setText($timeTwoStar) . ' - ' .
+                $yellow->setText($memoryTwoStar)
+            );
         }
+    }
+
+    private function getExamples(int $year, string $day, string $star): array|null
+    {
+        $starNumber = ($star === '*' ? 1 : 2);
+        $filesInputs   = glob("{$this->config[$year]}/day-$day-star-$starNumber-example-*.txt");
+        $filesExpected = glob("{$this->config[$year]}/day-$day-star-$starNumber-expected-*.txt");
+
+        if (empty($filesInputs) || empty($filesExpected) || count($filesInputs) !== count($filesExpected)) {
+            return null;
+        }
+
+        $examples = [];
+        for ($f = 0; $f < count($filesInputs); $f++) {
+            $expected = trim((string) file_get_contents($filesExpected[$f]));
+            if (ctype_digit($expected)) {
+                $expected = (int) $expected;
+            } elseif (is_numeric($expected)) {
+                $expected = (float) $expected;
+            }
+            $examples[] = [$expected => array_map('trim', (array) file($filesInputs[$f]))];
+        }
+
+        return $examples;
     }
 }
