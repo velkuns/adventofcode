@@ -50,10 +50,11 @@ class Algo extends AbstractScript
     public function run(): void
     {
         $arguments = Argument::getInstance();
-        $year = $arguments->get('y', 'year', (int) date('Y'));
-        $day  = $arguments->get('d', 'day', 1);
+        $year = (int) $arguments->get('y', 'year', (int) date('Y'));
+        $day  = (int) $arguments->get('d', 'day', 1);
 
-        $class = '\Application\Year' . $year . '\Day' . $day;
+        $doRendering = $arguments->has('render');
+        $class = '\Application\Year' . $year . '\Day' . $day . ($doRendering ? 'Rendering' : '');
 
         if (!class_exists($class)) {
             throw new \RuntimeException("Algorithm class does not exists for year $year & day $day!");
@@ -69,8 +70,19 @@ class Algo extends AbstractScript
             throw new \RuntimeException("No file for $year!");
         }
 
+        if ($doRendering) {
+            $this->render($class, $file, $year, $day);
+        } else {
+            $this->solve($class, $file, $year, $day);
+        }
+
+    }
+
+    private function solve(string $class, string $file, int $year, int $day): void
+    {
         /** @var AlgorithmInterface $solver */
         $solver = new $class();
+        $arguments = Argument::getInstance();
 
         $white  = (new Style())->bold();
         $yellow = (new Style())->colorForeground(Color::YELLOW);
@@ -123,7 +135,55 @@ class Algo extends AbstractScript
         }
     }
 
-    private function getExamples(int $year, string $day, string $star): array|null
+    private function render(string $class, string $file, int $year, int $day): void
+    {
+        /** @var AlgorithmInterface $solver */
+        $rendering = new $class();
+
+        $arguments = Argument::getInstance();
+
+        foreach (['*', '**'] as $star) {
+            $examples = $this->getExamples($year, $day, $star);
+            foreach ($examples ?? $solver->getExamples($star) as $index => $data) {
+                foreach ($data as $expected => $inputs) {
+                    Out::clear();
+                    Out::std(
+                        "\n\n\n\t\tExample - " . (new Style($star))->colorForeground(Color::YELLOW)->bold() . ' - ' . $index . "\n\n\n"
+                    );
+                    usleep(1_000_000);
+                    Out::clear();
+                    Out::std($rendering->render($star, $inputs));
+                }
+            }
+        }
+
+        $inputs = file($file);
+        $inputs = array_map('trim', $inputs); // remove trailing chars
+
+        if ($arguments->has('e', 'example')) {
+            return;
+        }
+
+        Out::clear();
+        Out::std(
+            "\n\n\n\t\tAdvent Of Code - $year - Day $day - " . (new Style('*'))->colorForeground(Color::YELLOW)->bold() . " - \n\n\n"
+        );
+        usleep(1_000_000);
+
+        Out::clear();
+        Out::std($rendering->render('*', $inputs));
+
+        usleep(2_000_000);
+        Out::clear();
+        Out::std(
+            "\n\n\n\t\tAdvent Of Code - $year - Day $day - " . (new Style('**'))->colorForeground(Color::YELLOW)->bold() . " - \n\n\n"
+        );
+        usleep(1_000_000);
+        Out::clear();
+        Out::std($rendering->render('*', $inputs));
+    }
+
+    private function getExamples(int $year, int $day, string $star): array|null
     {
         $starNumber = ($star === '*' ? 1 : 2);
         $filesInputs   = glob("{$this->config[$year]}/day-$day-star-$starNumber-example-*.txt");

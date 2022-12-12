@@ -13,15 +13,8 @@ namespace Application\Trigonometry;
 
 class Point
 {
-    private int $x;
-    private int $y;
-    private int $z;
-
-    public function __construct(int $x, int $y, int $z = 0)
+    public function __construct(protected int $x, protected int $y, protected int $z = 0)
     {
-        $this->x = $x;
-        $this->y = $y;
-        $this->z = $z;
     }
 
     public function getX(): int
@@ -63,12 +56,12 @@ class Point
             $y = $this->x * round(-sin($angleRad)) + $this->y * round(cos($angleRad));
         }
 
-        return new Point((int) $x, (int) $y, (int) $z);
+        return new static((int) $x, (int) $y, (int) $z);
     }
 
     public function translate(Vector $vector): Point
     {
-        return new Point(
+        return new static(
             $this->x + $vector->getX(),
             $this->y + $vector->gety(),
             $this->z + $vector->getZ()
