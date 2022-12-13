@@ -40,10 +40,12 @@ class Algo extends AbstractScript
     public function help(): void
     {
         $help = new Help('algo');
-        $help->addArgument('y', 'year', 'Year to solve', true, true);
-        $help->addArgument('d', 'day', 'Day to solve', true, true);
+        $help->addArgument('y', 'year', 'Year to solve', true);
+        $help->addArgument('d', 'day', 'Day to solve', true);
         $help->addArgument('e', 'example', 'Example Only');
         $help->addArgument('f', 'functional', 'Activate Algo in functional programming style');
+        $help->addArgument('s', 'skip-empty-lines', 'Remove empty lines from inputs');
+        $help->addArgument('', 'render', 'Use render script instead of solver script (if present)');
         $help->display();
     }
 
@@ -51,7 +53,7 @@ class Algo extends AbstractScript
     {
         $arguments = Argument::getInstance();
         $year = (int) $arguments->get('y', 'year', (int) date('Y'));
-        $day  = (int) $arguments->get('d', 'day', 1);
+        $day  = (int) $arguments->get('d', 'day', (int) date('d'));
 
         $doRendering = $arguments->has('render');
         $class = '\Application\Year' . $year . '\Day' . $day . ($doRendering ? 'Rendering' : '');
@@ -95,8 +97,9 @@ class Algo extends AbstractScript
         Out::std($white->setText("$line EXAMPLES $functionalSuffix $line"));
         foreach (['*', '**'] as $star) {
             $examples = $this->getExamples($year, $day, $star);
-            foreach ($examples ?? $solver->getExamples($star) as $data) {
+            foreach (($examples ?? $solver->getExamples($star)) as $data) {
                 foreach ($data as $expected => $inputs) {
+                    $inputs = $this->cleanEmptyLines($inputs);
                     $answer = $solver->solve($star, $inputs, $arguments->has('f', 'functional'));
                     Out::std(
                         $yellow->setText(str_pad($star, 2)) . ':  ' .
@@ -107,7 +110,7 @@ class Algo extends AbstractScript
         }
 
         $inputs = file($file);
-        $inputs = array_map('trim', $inputs); // remove trailing chars
+        $inputs = $this->cleanEmptyLines(array_map('trim', $inputs)); // remove trailing chars
 
         if (!$arguments->has('e', 'example')) {
             $timeOneStar   = -microtime(true);
@@ -142,10 +145,11 @@ class Algo extends AbstractScript
 
         $arguments = Argument::getInstance();
 
-        foreach (['*', '**'] as $star) {
+        foreach (['*'] as $star) {
             $examples = $this->getExamples($year, $day, $star);
-            foreach ($examples ?? $solver->getExamples($star) as $index => $data) {
-                foreach ($data as $expected => $inputs) {
+            foreach (($examples ?? $solver->getExamples($star)) as $index => $data) {
+                foreach ($data as $inputs) {
+                    $inputs = $this->cleanEmptyLines($inputs);
                     Out::clear();
                     Out::std(
                         "\n\n\n\t\tExample - " . (new Style($star))->colorForeground(Color::YELLOW)->bold() . ' - ' . $index . "\n\n\n"
@@ -157,8 +161,9 @@ class Algo extends AbstractScript
             }
         }
 
+
         $inputs = file($file);
-        $inputs = array_map('trim', $inputs); // remove trailing chars
+        $inputs = $this->cleanEmptyLines(array_map('trim', $inputs)); // remove trailing chars
 
         if ($arguments->has('e', 'example')) {
             return;
@@ -205,5 +210,14 @@ class Algo extends AbstractScript
         }
 
         return $examples;
+    }
+
+    private function cleanEmptyLines(array $inputs): array
+    {
+        if (!Argument::getInstance()->has('skip-empty-lines', 's')) {
+            return $inputs;
+        }
+
+        return array_filter($inputs, fn(string $input) => $input !== '');
     }
 }

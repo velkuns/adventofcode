@@ -27,10 +27,6 @@ abstract class Day implements AlgorithmInterface
         }
     }
 
-    abstract protected function starOne(array $inputs): mixed;
-
-    abstract protected function starTwo(array $inputs): mixed;
-
     private function starOneFunctional(): int
     {
         return 0;

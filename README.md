@@ -13,9 +13,11 @@ Use    : bin/console algo [OPTION]...
 OPTIONS:
           --help                        Reserved - Display Help
           --color                       Output with colors
-  -y ARG, --year=ARG                    Year to solve - MANDATORY
-  -d ARG, --day=ARG                     Day to solve - MANDATORY
+  -y ARG, --year=ARG                    Year to solve (default current year)
+  -d ARG, --day=ARG                     Day to solve (default current day)
   -e,     --example                     Example Only
+  -s,     --skip-empty-lines            Remove empty lines from inputs
+          --render                      Use render script instead of solver script (if present)
 
 ```
 
