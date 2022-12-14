@@ -79,14 +79,6 @@ class Vector
         return new self($p1, $p2);
     }
 
-    public function mirrorOnAxis(string $axis): Vector
-    {
-        $p1 = $this->origin->mirrorOnAxis($axis);
-        $p2 = $this->destination->mirrorOnAxis($axis);
-
-        return new self($p1, $p2);
-    }
-
     public function squareSize(): int
     {
         return ($this->x * $this->x) + ($this->y * $this->y) + ($this->z * $this->z);

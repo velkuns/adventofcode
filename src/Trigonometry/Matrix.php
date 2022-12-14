@@ -13,19 +13,46 @@ namespace Application\Trigonometry;
 
 class Matrix
 {
-    public function __construct(array $matrix)
+    private array $matrix;
+
+    private int $minX;
+    private int $maxX;
+    private int $minY;
+    private int $maxY;
+
+    public static function fromCoordinates(Point2D $p1, Point2D $p2, mixed $default): static
+    {
+        return new static(
+            array_fill(
+                $p1->getX(),
+                ($p2->getX() - $p1->getX() + 1),
+                array_fill($p1->getY(), ($p2->getY() - $p1->getY() + 1), $default)
+            )
+        );
+    }
+
+    public function __construct(array $matrix = [0 => []])
     {
         $this->matrix = $matrix;
+
+        $keys = array_keys($this->matrix);
+        $this->minX = min($keys);
+        $this->maxX = max($keys);
+
+        $this->minY = min(array_map(fn($line) => min(array_keys($line)), $this->matrix));
+        $this->maxY = max(array_map(fn($line) => max(array_keys($line)), $this->matrix));
     }
 
     public function transpose(): static
     {
-        $columns = [];
-        for ($n = 0; $n < count($this->matrix[0]); $n++) {
-            $columns[] = array_column($this->matrix, $n);
+        $array = [];
+        foreach ($this->matrix as $x => $column) {
+            foreach ($column as $y => $value) {
+                $array[$y][$x] = $value;
+            }
         }
 
-        return new static($columns);
+        return new static($array);
     }
 
     public function height(): int
@@ -33,14 +60,19 @@ class Matrix
         return count($this->matrix);
     }
 
+    public function getMaxY(): int
+    {
+        return $this->maxY;
+    }
+
     public function width(): int
     {
         return count($this->matrix[0] ?? []);
     }
 
-    public function get(Point $point): mixed
+    public function get(Point $point, mixed $default = null): mixed
     {
-        return $this->matrix[$point->getX()][$point->getY()] ?? null;
+        return $this->matrix[$point->getX()][$point->getY()] ?? $default;
     }
 
     public function set(Point $point, mixed $value): static
