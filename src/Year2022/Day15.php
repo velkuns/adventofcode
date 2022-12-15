@@ -13,11 +13,8 @@ namespace Application\Year2022;
 
 use Application\Common\Day;
 use Application\Math\IntRanges;
-use Application\Math\Ranges;
-use Application\Trigonometry\Point;
 use Application\Trigonometry\Point2D;
 use Application\Trigonometry\Vector;
-use Eureka\Component\Console\Progress\Progress;
 
 class Day15 extends Day
 {
@@ -58,15 +55,14 @@ class Day15 extends Day
      * @param int $axisValue
      * @param string $axisName
      * @param array|null $beacons
-     * @param array $bound
      * @return IntRanges
      */
-    private function getRanges(array $vectors, int $axisValue, string $axisName, array|null &$beacons, array $bound = []): IntRanges
+    private function getRanges(array $vectors, int $axisValue, string $axisName, array|null &$beacons): IntRanges
     {
         $ranges  = new IntRanges();
 
         foreach ($vectors as $vector) {
-            //~ Check if vector area (with "radius" == manhattan distance from sensor to the closest beacon
+            //~ Check if vector area (with "radius" == manhattan distance) from sensor to the closest beacon
             //~ is traversed by the line we want to check. If not, skip this vector
             $x = $axisName === self::AXIS_X ? $axisValue : 0;
             $y = $axisName === self::AXIS_Y ? $axisValue : 0;
@@ -97,12 +93,7 @@ class Day15 extends Day
         return $ranges;
     }
 
-    /**
-     * You guessed 5_564_013. That's not the right answer; your answer is too low.
-     * @param array $inputs
-     * @return float
-     */
-    protected function starOne(array $inputs): float
+    protected function starOne(array $inputs): int
     {
         array_pop($inputs);               // x & y value for part 2
         $y = (int) array_pop($inputs); // y value for part 1
