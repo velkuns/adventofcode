@@ -13,6 +13,26 @@ namespace Application\Trigonometry;
 
 class NormalizedVector extends Vector
 {
+    public static function left(): static
+    {
+        return new static(new Point(0, 0, 0), new Point(-1, 0, 0));
+    }
+
+    public static function right(): static
+    {
+        return new static(new Point(0, 0, 0), new Point(1, 0, 0));
+    }
+
+    public static function up(): static
+    {
+        return new static(new Point(0, 0, 0), new Point(0, -1, 0));
+    }
+
+    public static function down(): static
+    {
+        return new static(new Point(0, 0, 0), new Point(0, 1, 0));
+    }
+
     public function __construct(Point $p1, Point $p2, int $norm = 1)
     {
         $x = $p2->getX() - $p1->getX();

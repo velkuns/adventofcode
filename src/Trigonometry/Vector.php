@@ -13,11 +13,14 @@ namespace Application\Trigonometry;
 
 class Vector
 {
-    private Point $origin;
-    private Point $destination;
-    private int $x;
-    private int $y;
-    private int $z;
+    public const TYPE_MANHATTAN = 0;
+    public const TYPE_CIRCLE = 1;
+
+    protected Point $origin;
+    protected Point $destination;
+    protected int $x;
+    protected int $y;
+    protected int $z;
 
     public function __construct(Point $p1, Point $p2, bool $sort = true)
     {
@@ -68,7 +71,7 @@ class Vector
         $p1 = $this->origin();
         $p2 = $this->destination()->translate($v);
 
-        return new Vector($p1, $p2, false);
+        return new static($p1, $p2, false);
     }
 
     public function rotateOnAxis(string $axis, float $angle): Vector
@@ -76,7 +79,7 @@ class Vector
         $p1 = $this->origin->rotateOnAxis($axis, $angle);
         $p2 = $this->destination->rotateOnAxis($axis, $angle);
 
-        return new self($p1, $p2);
+        return new static($p1, $p2);
     }
 
     public function squareSize(): int
@@ -91,19 +94,15 @@ class Vector
 
     public function manhattanDistance(): int
     {
-        return
-            ($this->destination->getX() - $this->origin->getX()) +
-            ($this->destination->getY() - $this->origin->getY()) +
-            ($this->destination->getZ() - $this->origin->getZ())
-        ;
+        return abs($this->x) + abs($this->y) + abs($this->z);
     }
 
     public function __toString(): string
     {
-        return $this->origin . ' -> ' . $this->destination . " : ($this->x $this->y $this->z) [" . $this->squareSize() . "]";
+        return $this->origin . ' -> ' . $this->destination . " : ($this->x $this->y $this->z) [" . $this->manhattanDistance() . "]";
     }
 
-    private function sort(Point $p1, Point $p2): array
+    protected function sort(Point $p1, Point $p2): array
     {
         if (
             $p1->getX() < $p2->getX() ||
