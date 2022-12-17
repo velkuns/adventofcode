@@ -14,7 +14,7 @@ namespace Application\Year2022;
 use Application\Common\Day;
 use Application\Trigonometry\Line2D;
 use Application\Trigonometry\Matrix;
-use Application\Trigonometry\NormalizedVector;
+use Application\Trigonometry\DirectionalVector;
 use Application\Trigonometry\Point2D;
 
 class Day14 extends Day
@@ -63,9 +63,9 @@ class Day14 extends Day
 
     private function sandfall(Matrix $cave, Point2D $sand, bool $isAbyss): bool
     {
-        $down      = new NormalizedVector(new Point2D(0, 0), new Point2D(0, 1));
-        $downLeft  = new NormalizedVector(new Point2D(0, 0), new Point2D(-1, 1));
-        $downRight = new NormalizedVector(new Point2D(0, 0), new Point2D(1, 1));
+        $down      = new DirectionalVector(new Point2D(0, 0), new Point2D(0, 1));
+        $downLeft  = new DirectionalVector(new Point2D(0, 0), new Point2D(-1, 1));
+        $downRight = new DirectionalVector(new Point2D(0, 0), new Point2D(1, 1));
 
         while (true) {
             $next = $sand->translate($down);

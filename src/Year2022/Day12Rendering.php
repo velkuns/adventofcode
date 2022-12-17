@@ -14,7 +14,7 @@ namespace Application\Year2022;
 use Application\Common\Day;
 use Application\Common\DayRendering;
 use Application\Trigonometry\Matrix;
-use Application\Trigonometry\NormalizedVector;
+use Application\Trigonometry\DirectionalVector;
 use Application\Trigonometry\Point2D;
 use Application\Trigonometry\Vector;
 use Eureka\Component\Console\Argument\Argument;
@@ -30,10 +30,10 @@ class Day12Rendering extends DayRendering
     private function directions(): array
     {
         static $direction = [
-            '^' => new NormalizedVector(new Point2D(0, 0), new Point2D(0, -1)),
-            'v' => new NormalizedVector(new Point2D(0, 0), new Point2D(0, 1)),
-            '<' => new NormalizedVector(new Point2D(0, 0), new Point2D(-1, 0)),
-            '>' => new NormalizedVector(new Point2D(0, 0), new Point2D(1, 0)),
+            '^' => new DirectionalVector(new Point2D(0, 0), new Point2D(0, -1)),
+            'v' => new DirectionalVector(new Point2D(0, 0), new Point2D(0, 1)),
+            '<' => new DirectionalVector(new Point2D(0, 0), new Point2D(-1, 0)),
+            '>' => new DirectionalVector(new Point2D(0, 0), new Point2D(1, 0)),
         ];
 
         return $direction;

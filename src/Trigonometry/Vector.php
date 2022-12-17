@@ -13,9 +13,6 @@ namespace Application\Trigonometry;
 
 class Vector
 {
-    public const TYPE_MANHATTAN = 0;
-    public const TYPE_CIRCLE = 1;
-
     protected Point $origin;
     protected Point $destination;
     protected int $x;
@@ -53,7 +50,10 @@ class Vector
 
     public function isSameAs(Vector $vector): bool
     {
-        return $this->getX() === $vector->getX() && $this->getY() === $vector->getY() && $this->getZ() === $vector->getZ();
+        return $this->getX() === $vector->getX()
+            && $this->getY() === $vector->getY()
+            && $this->getZ() === $vector->getZ()
+        ;
     }
 
     public function origin(): Point
@@ -99,7 +99,9 @@ class Vector
 
     public function __toString(): string
     {
-        return $this->origin . ' -> ' . $this->destination . " : ($this->x $this->y $this->z) [" . $this->manhattanDistance() . "]";
+        return $this->origin . ' -> ' . $this->destination .
+            " : ($this->x $this->y $this->z) [" . $this->manhattanDistance() . "]"
+        ;
     }
 
     protected function sort(Point $p1, Point $p2): array

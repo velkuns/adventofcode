@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Application\Year2022;
 
 use Application\Common\AlgorithmInterface;
-use Application\Trigonometry\NormalizedVector;
+use Application\Trigonometry\DirectionalVector;
 use Application\Trigonometry\Point;
 use Application\Trigonometry\Vector;
 use Eureka\Component\Console\Argument\Argument;
@@ -44,13 +44,13 @@ class Day9 implements AlgorithmInterface
         return (string) ($star === '*' ? $this->starOne($inputs) : $this->starTwo($inputs));
     }
 
-    private function getVector(string $direction): NormalizedVector
+    private function getVector(string $direction): DirectionalVector
     {
         static $vectors = [
-            'U' => new NormalizedVector(new Point(0, 0), new Point(0, 1)),
-            'D' => new NormalizedVector(new Point(0, 0), new Point(0, -1)),
-            'L' => new NormalizedVector(new Point(0, 0), new Point(-1, 0)),
-            'R' => new NormalizedVector(new Point(0, 0), new Point(1, 0)),
+            'U' => new DirectionalVector(new Point(0, 0), new Point(0, 1)),
+            'D' => new DirectionalVector(new Point(0, 0), new Point(0, -1)),
+            'L' => new DirectionalVector(new Point(0, 0), new Point(-1, 0)),
+            'R' => new DirectionalVector(new Point(0, 0), new Point(1, 0)),
         ];
 
         return $vectors[$direction];
@@ -62,7 +62,7 @@ class Day9 implements AlgorithmInterface
             return $tail;
         }
 
-        return $tail->translate(new NormalizedVector($tail, $head));
+        return $tail->translate(new DirectionalVector($tail, $head));
     }
 
     private function starOne(array $inputs): int

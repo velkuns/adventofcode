@@ -13,7 +13,7 @@ namespace Application\Year2022;
 
 use Application\Common\Day;
 use Application\Trigonometry\Matrix;
-use Application\Trigonometry\NormalizedVector;
+use Application\Trigonometry\DirectionalVector;
 use Application\Trigonometry\Point2D;
 use Application\Trigonometry\Vector;
 
@@ -26,10 +26,10 @@ class Day12 extends Day
     {
         //~ Inverted char key because we process from the End
         static $direction = [
-            'v' => new NormalizedVector(new Point2D(0, 0), new Point2D(0, -1)),
-            '^' => new NormalizedVector(new Point2D(0, 0), new Point2D(0, 1)),
-            '>' => new NormalizedVector(new Point2D(0, 0), new Point2D(-1, 0)),
-            '<' => new NormalizedVector(new Point2D(0, 0), new Point2D(1, 0)),
+            'v' => new DirectionalVector(new Point2D(0, 0), new Point2D(0, -1)),
+            '^' => new DirectionalVector(new Point2D(0, 0), new Point2D(0, 1)),
+            '>' => new DirectionalVector(new Point2D(0, 0), new Point2D(-1, 0)),
+            '<' => new DirectionalVector(new Point2D(0, 0), new Point2D(1, 0)),
         ];
 
         return $direction;
