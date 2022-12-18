@@ -94,7 +94,6 @@ class Algo extends AbstractScript
         $functionalSuffix = $arguments->has('f', 'functional') ? ' (FUNCTIONAL)' : '';
 
         $line = str_repeat('-', 42);
-        /*
         Out::std($white->setText("$line EXAMPLES $functionalSuffix $line"));
         foreach (['*', '**'] as $star) {
             $examples = $this->getExamples($year, $day, $star);
@@ -108,7 +107,7 @@ class Algo extends AbstractScript
                     );
                 }
             }
-        }*/
+        }
 
         $inputs = file($file);
         $inputs = $this->cleanEmptyLines(array_map('trim', $inputs)); // remove trailing chars

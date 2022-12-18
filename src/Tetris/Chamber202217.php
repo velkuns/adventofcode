@@ -106,7 +106,7 @@ class Chamber202217
 
         if (!$withRendering && $this->shapeCount++ > 100) {
             $this->shapeCount = 0;
-            $this->matrix = $matrix->sliceOnY(-20);
+            $this->matrix = $matrix->sliceOnY(-30);
         }
     }
 
