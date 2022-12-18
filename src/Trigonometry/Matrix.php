@@ -39,8 +39,8 @@ class Matrix
         $this->minX = min($keys);
         $this->maxX = max($keys);
 
-        $this->minY = min(array_map(fn($line) => min(array_keys($line)), $this->matrix));
-        $this->maxY = max(array_map(fn($line) => max(array_keys($line)), $this->matrix));
+        $this->minY = min(array_map(fn($line) => empty($line) ? 0 : min(array_keys($line)), $this->matrix));
+        $this->maxY = max(array_map(fn($line) => empty($line) ? 0 : max(array_keys($line)), $this->matrix));
     }
 
     public function transpose(): static
@@ -53,6 +53,14 @@ class Matrix
         }
 
         return new static($array);
+    }
+
+    public function invert(): static
+    {
+        $matrix = $this->matrix;
+        krsort($matrix);
+
+        return new static($matrix);
     }
 
     public function height(): int
@@ -112,9 +120,48 @@ class Matrix
         return $points;
     }
 
-    public function render(): string
+    public function sliceOnY(int $offset, ?int $length = null): static
+    {
+        $matrix = array_map(fn ($line) => array_slice($line, $offset, $length, true), $this->matrix);
+
+        return new static($matrix);
+    }
+
+    public function render(bool $invert = false): string
     {
         $matrix = $this->transpose();
+        if ($invert) {
+            $matrix = $matrix->invert();
+        }
+
         return implode("\n", array_map(fn ($line) => implode('', $line), $matrix->matrix));
+    }
+
+    public function renderIncompleteMatrix(bool $invert = false): string
+    {
+        $keys = array_keys($this->matrix);
+        $minX = 0;min($keys);
+        $maxX = 8;max($keys);
+        $minY = min(array_map(fn($line) => empty($line) ? 0 : min(array_keys($line)), $this->matrix));
+        $maxY = max(array_map(fn($line) => empty($line) ? 0 : max(array_keys($line)), $this->matrix));
+
+        $buffer = '';
+        if ($invert) {
+            for ($y = $maxY; $y >= $minY; $y--) {
+                for ($x = $minX; $x <= $maxX; $x++) {
+                    $buffer .= $this->matrix[$x][$y] ?? ($x === 0 || $x === 8 ? '|' : '.');
+                }
+                $buffer .= "\n";
+            }
+            return $buffer;
+        }
+
+        for ($y = $minY; $y <= $maxY; $y++) {
+            for ($x = $minX; $x <= $maxX; $x++) {
+                $buffer .= $this->matrix[$x][$y] ?? ($x === 0 || $x === 8 ? '|' : ' ');
+            }
+            $buffer .= "\n";
+        }
+        return $buffer;
     }
 }

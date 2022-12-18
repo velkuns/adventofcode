@@ -16,9 +16,9 @@ enum Direction: string
     case Up = '^';
     case Down = 'v';
 
-    case Right = '<';
+    case Right = '>';
 
-    case Left = '>';
+    case Left = '<';
 
     public static function fromVector(DirectionalVector $vector): Direction
     {

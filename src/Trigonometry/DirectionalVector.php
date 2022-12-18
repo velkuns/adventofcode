@@ -23,24 +23,24 @@ class DirectionalVector extends Vector
         };
     }
 
-    public static function left(): static
+    public static function left(bool $invert = false): static
     {
-        return new static(new Point(0, 0, 0), new Point(-1, 0, 0));
+        return new static(new Point(0, 0, 0), new Point($invert ? 1 : -1, 0, 0));
     }
 
-    public static function right(): static
+    public static function right(bool $invert = false): static
     {
-        return new static(new Point(0, 0, 0), new Point(1, 0, 0));
+        return new static(new Point(0, 0, 0), new Point($invert ? -1 : 1, 0, 0));
     }
 
-    public static function up(): static
+    public static function down(bool $invert = false): static
     {
-        return new static(new Point(0, 0, 0), new Point(0, -1, 0));
+        return new static(new Point(0, 0, 0), new Point(0, $invert ? 1 : -1, 0));
     }
 
-    public static function down(): static
+    public static function up(bool $invert = false): static
     {
-        return new static(new Point(0, 0, 0), new Point(0, 1, 0));
+        return new static(new Point(0, 0, 0), new Point(0, $invert ? -1 : 1, 0));
     }
 
     public function __construct(Point $p1, Point $p2, int $norm = 1)

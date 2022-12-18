@@ -13,6 +13,7 @@ namespace Application\Tetris;
 
 use Application\Trigonometry\Direction;
 use Application\Trigonometry\DirectionalVector;
+use Application\Trigonometry\Point2D;
 use Application\Trigonometry\Point2DCollider;
 
 class Shape
@@ -20,68 +21,7 @@ class Shape
     /** @var Point2DCollider[][] */
     protected array $pointsCollideOn = [];
 
-    public static function from(ShapeType $char, int $startX = 0, int $startY = 0): static
-    {
-        return match ($char) {
-            ShapeType::Cross         => static::cross($startX, $startY),
-            ShapeType::HorizontalBar => static::horizontalBar($startX, $startY),
-            ShapeType::VerticalBar   => static::verticalBar($startX, $startY),
-            ShapeType::Square        => static::square($startX, $startY),
-            ShapeType::Angle         => static::angle($startX, $startY),
-        };
-    }
-
-    public static function cross(int $startX = 0, int $startY = 0): static
-    {
-        return new static([
-            new Point2DCollider($startX + 1, $startY + 0, [DirectionalVector::left(), DirectionalVector::right(), DirectionalVector::down()]),
-            new Point2DCollider($startX + 0, $startY + 1, [DirectionalVector::left(), DirectionalVector::down()]),
-            new Point2DCollider($startX + 1, $startY + 1),
-            new Point2DCollider($startX + 2, $startY + 1, [DirectionalVector::right(), DirectionalVector::down()]),
-            new Point2DCollider($startX + 1, $startY + 2, [DirectionalVector::left(), DirectionalVector::right()]),
-        ]);
-    }
-
-    public static function horizontalBar(int $startX = 0, int $startY = 0): static
-    {
-        return new static([
-            new Point2DCollider($startX + 0, $startY + 0, [DirectionalVector::left(), DirectionalVector::down()]),
-            new Point2DCollider($startX + 1, $startY + 0, [DirectionalVector::down()]),
-            new Point2DCollider($startX + 2, $startY + 0, [DirectionalVector::down()]),
-            new Point2DCollider($startX + 3, $startY + 0, [DirectionalVector::right(), DirectionalVector::down()]),
-        ]);
-    }
-
-    public static function verticalBar(int $startX = 0, int $startY = 0): static
-    {
-        return new static([
-            new Point2DCollider($startX + 0, $startY + 0, [DirectionalVector::left(), DirectionalVector::right(), DirectionalVector::down()]),
-            new Point2DCollider($startX + 0, $startY + 1, [DirectionalVector::left(), DirectionalVector::right()]),
-            new Point2DCollider($startX + 0, $startY + 2, [DirectionalVector::left(), DirectionalVector::right()]),
-            new Point2DCollider($startX + 0, $startY + 3, [DirectionalVector::left(), DirectionalVector::right()]),
-        ]);
-    }
-
-    public static function square(int $startX = 0, int $startY = 0): static
-    {
-        return new static([
-            new Point2DCollider($startX + 0, $startY + 0, [DirectionalVector::left(), DirectionalVector::down()]),
-            new Point2DCollider($startX + 1, $startY + 0, [DirectionalVector::right(), DirectionalVector::down()]),
-            new Point2DCollider($startX + 0, $startY + 1, [DirectionalVector::left()]),
-            new Point2DCollider($startX + 1, $startY + 1, [DirectionalVector::right()]),
-        ]);
-    }
-
-    public static function angle(int $startX = 0, int $startY = 0): static
-    {
-        return new static([
-            new Point2DCollider($startX + 0, $startY + 0, [DirectionalVector::left(), DirectionalVector::down()]),
-            new Point2DCollider($startX + 1, $startY + 0, [DirectionalVector::down()]),
-            new Point2DCollider($startX + 2, $startY + 0, [DirectionalVector::right(), DirectionalVector::down()]),
-            new Point2DCollider($startX + 2, $startY + 1, [DirectionalVector::left(), DirectionalVector::right()]),
-            new Point2DCollider($startX + 2, $startY + 2, [DirectionalVector::left(), DirectionalVector::right()]),
-        ]);
-    }
+    private Point2DCollider $highestPoint;
 
     /**
      * @param Point2DCollider[] $points
@@ -89,10 +29,30 @@ class Shape
     public function __construct(protected readonly array $points)
     {
         $this->pointsCollideOn = [
-            Direction::Down->value  => array_filter($points, fn ($point) => $point->isCollideOnLeft()),
-            Direction::Left->value  => array_filter($points, fn ($point) => $point->isCollideOnRight()),
-            Direction::Right->value => array_filter($points, fn ($point) => $point->isCollideOnDown()),
+            Direction::Down->value  => array_filter($points, fn ($point) => $point->isCollideOn(Direction::Down)),
+            Direction::Left->value  => array_filter($points, fn ($point) => $point->isCollideOn(Direction::Left)),
+            Direction::Right->value => array_filter($points, fn ($point) => $point->isCollideOn(Direction::Right)),
         ];
+
+        $maxY = null;
+        foreach ($this->points as $point) {
+            if ($maxY === null || $maxY < $point->getY()) {
+                $this->highestPoint = $point;
+            }
+        }
+    }
+
+    /**
+     * @return Point2DCollider[]
+     */
+    public function getPoints(): array
+    {
+        return $this->points;
+    }
+
+    public function getHighestPoint(): Point2DCollider
+    {
+        return $this->highestPoint;
     }
 
     public function move(DirectionalVector $vector): static
@@ -105,8 +65,20 @@ class Shape
         return new static($points);
     }
 
+    /**
+     * @param Direction $direction
+     * @return Point2DCollider[]
+     */
     public function getPointsCollideOn(Direction $direction): array
     {
         return $this->pointsCollideOn[$direction->value];
+    }
+
+    public function debug(): void
+    {
+        foreach ($this->points as $point) {
+            echo "$point\n";
+        }
+        echo "----------------\n";
     }
 }

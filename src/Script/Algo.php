@@ -94,6 +94,7 @@ class Algo extends AbstractScript
         $functionalSuffix = $arguments->has('f', 'functional') ? ' (FUNCTIONAL)' : '';
 
         $line = str_repeat('-', 42);
+        /*
         Out::std($white->setText("$line EXAMPLES $functionalSuffix $line"));
         foreach (['*', '**'] as $star) {
             $examples = $this->getExamples($year, $day, $star);
@@ -107,28 +108,31 @@ class Algo extends AbstractScript
                     );
                 }
             }
-        }
+        }*/
 
         $inputs = file($file);
         $inputs = $this->cleanEmptyLines(array_map('trim', $inputs)); // remove trailing chars
 
         if (!$arguments->has('e', 'example')) {
+
+            Out::std($white->setText("$line OUTPUT $functionalSuffix $line"));
+
             $timeOneStar   = -microtime(true);
             $solveOneStar  = $solver->solve('*', $inputs, $arguments->has('f', 'functional'));
             $timeOneStar   = '[' . round($timeOneStar + microtime(true), 5) . 's]';
             $memoryOneStar = '[' . round(memory_get_peak_usage() / 1024 / 1024, 1) . 'MB]';
-            $timeTwoStar   = -microtime(true);
-            $solveTwoStar  = $solver->solve('**', $inputs, $arguments->has('f', 'functional'));
-            $timeTwoStar   = '[' . round($timeTwoStar + microtime(true), 5) . 's]';
-            $memoryTwoStar = '[' . round(memory_get_peak_usage() / 1024 / 1024, 1) . 'MB]';
-
-            Out::std($white->setText("$line OUTPUT $functionalSuffix $line"));
             Out::std(
                 $yellow->setText('*') . ' : ' .
                 $cyan->setText($solveOneStar) . ' - ' .
                 $red->setText($timeOneStar) . ' - ' .
                 $yellow->setText($memoryOneStar)
             );
+
+            $timeTwoStar   = -microtime(true);
+            $solveTwoStar  = $solver->solve('**', $inputs, $arguments->has('f', 'functional'));
+            $timeTwoStar   = '[' . round($timeTwoStar + microtime(true), 5) . 's]';
+            $memoryTwoStar = '[' . round(memory_get_peak_usage() / 1024 / 1024, 1) . 'MB]';
+
             Out::std(
                 $yellow->setText('**') . ': ' .
                 $cyan->setText($solveTwoStar) . ' - ' .

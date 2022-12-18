@@ -14,7 +14,7 @@ namespace Application\Trigonometry;
 class Point2DCollider extends Point2D
 {
     /** @var DirectionalVector[] */
-    private array $collideOn;
+    private array $collideOn = [];
 
     /**
      * @param int $x
@@ -46,32 +46,22 @@ class Point2DCollider extends Point2D
 
     public function isCollideOnLeft(): bool
     {
-        return $this->collideOn[Direction::Left->value] !== null;
+        return isset($this->collideOn[Direction::Left->value]);
     }
 
     public function isCollideOnRight(): bool
     {
-        return $this->collideOn[Direction::Right->value] !== null;
+        return isset($this->collideOn[Direction::Right->value]);
     }
 
     public function isCollideOnUp(): bool
     {
-        return $this->collideOn[Direction::Up->value] !== null;
+        return isset($this->collideOn[Direction::Up->value]);
     }
 
     public function isCollideOnDown(): bool
     {
-        return $this->collideOn[Direction::Down->value] !== null;
-    }
-
-    public function getCoordinates(): string
-    {
-        return "$this->x,$this->y";
-    }
-
-    public function __toString(): string
-    {
-        return "($this->x,$this->y)";
+        return isset($this->collideOn[Direction::Down->value]);
     }
 
     public function translate(Vector $vector): static
@@ -81,5 +71,14 @@ class Point2DCollider extends Point2D
             $this->y + $vector->gety(),
             $this->collideOn
         );
+    }
+
+    public function __toString(): string
+    {
+        return "($this->x,$this->y) [" .
+            ($this->isCollideOnLeft() ? '<' : ' ') .
+            ($this->isCollideOnDown() ? 'v' : ' ') .
+            ($this->isCollideOnRight() ? '>' : ' ') . ']'
+        ;
     }
 }
