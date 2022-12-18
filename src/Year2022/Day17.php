@@ -13,15 +13,14 @@ namespace Application\Year2022;
 
 use Application\Common\Day;
 use Application\Tetris\Chamber202217;
+use Application\Tetris\Shape;
 use Application\Tetris\ShapeFactory;
 use Application\Tetris\ShapeType;
-use Eureka\Component\Console\Progress\Progress;
-
 class Day17 extends Day
 {
-    protected function starOne(array $inputs): int
+    private function newShape(int $n, int $maxHeight): Shape
     {
-        $shapeTypes = [
+        static $shapeTypes =  [
             ShapeType::HorizontalBar,
             ShapeType::Cross,
             ShapeType::Angle,
@@ -29,78 +28,58 @@ class Day17 extends Day
             ShapeType::Square,
         ];
 
-        $chamber = new Chamber202217($inputs[0], 7, 0);
+        $shapeType = $shapeTypes[($n - 1) % 5];
 
-        //~ Start main loop
-        for ($n = 1; $n < 2023; $n++) {
-            //~ New Rock Shape
-            $shape = ShapeFactory::from($shapeTypes[($n - 1) % 5], 3, $chamber->getMaxHeight() + 4);
-            $shape = $chamber->jet($shape);
-            while (($shape = $chamber->fall($shape)) !== false) {
-                $shape = $chamber->jet($shape);
-            }
-        }
+        return ShapeFactory::from($shapeType, 3, $maxHeight + 4);
+    }
 
-        return $chamber->getMaxHeight();
+    protected function starOne(array $inputs): int
+    {
+        $deltas  = $this->computeDeltas($inputs[0], 2022);
+
+        return array_sum(array_map('intval', str_split($deltas)));
     }
 
     protected function starTwo(array $inputs): int
     {
-        $deltas = $this->computeDeltas($inputs[0], 10_000);
+        $deltas  = $this->computeDeltas($inputs[0], 10_000);
         [$header, $period] = $this->findPeriodicity($deltas);
 
-        //$totalIteration = 1_000_000_000_000;
-        $totalIteration = 2023;
-
-        echo "Seems we have period:\n";
-        echo " - header: " . strlen($header) . "\n";
-        echo " - period: " . strlen($period) . "\n";
+        $totalIteration = 1_000_000_000_000;
 
         $nbPeriods = (int) (($totalIteration - strlen($header)) / strlen($period));
         $modulo    = (int) (($totalIteration - strlen($header)) % strlen($period));
 
-        $tail = substr($deltas, -$modulo);
-
-        echo "Tail: $tail\n";
+        $tail = $modulo > 0 ? substr($period, 0, $modulo) : '';
 
         $headerHeight = array_sum(array_map('intval', str_split($header)));
         $periodHeight = array_sum(array_map('intval', str_split($period)));
         $tailHeight   = array_sum(array_map('intval', str_split($tail)));
-
-
-        echo "header height: $headerHeight\n";
-        echo "period height: $periodHeight\n";
-        echo "tail height: $tailHeight\n";
-        echo "nb periods: $nbPeriods\n";
-
 
         return $headerHeight + ($periodHeight * $nbPeriods) + $tailHeight;
     }
 
     private function computeDeltas(string $jetPattern, int $iterations): string
     {
-        $shapeTypes = [
-            ShapeType::HorizontalBar,
-            ShapeType::Cross,
-            ShapeType::Angle,
-            ShapeType::VerticalBar,
-            ShapeType::Square,
-        ];
-
         $chamber   = new Chamber202217($jetPattern, 7, 0);
 
         //~ Try to find periodicity on first 10k items
         $deltas = '';
         $previousHeight = 0;
-        for ($n = 1; $n < 10_000; $n++) {
+        //~ Start main loop
+        for ($n = 1; $n <= $iterations; $n++) {
             //~ New Rock Shape
-            $shape = ShapeFactory::from($shapeTypes[($n - 1) % 5], 3, $chamber->getMaxHeight() + 4);
-            $shape = $chamber->jet($shape);;
+            $shape = $this->newShape($n, $chamber->getMaxHeight());
+
+            //~ First jet
+            $shape = $chamber->jet($shape);
+
+            //~ Loop on falling + jet
             while (($shape = $chamber->fall($shape)) !== false) {
                 $shape = $chamber->jet($shape);
             }
 
-            $deltas .= $chamber->getMaxHeight() - $previousHeight;
+            $deltas .= ($chamber->getMaxHeight() - $previousHeight);
             $previousHeight = $chamber->getMaxHeight();
         }
 
@@ -109,32 +88,37 @@ class Day17 extends Day
 
     private function findPeriodicity(string $deltas): array
     {
-        echo "Find Periodicity:\n";
-        $periods  = [];
-        $nbMax    = strlen($deltas);
-        $minItems = 5;
+        $nbMax    = strlen($deltas); // Delta size
+        $minItems = 5; // Min item in chunk. As we have 5 fives different shape, start chunk at 5
 
-        $progress = new Progress('Shapes', $nbMax);
-        $progress->setTypeDisplay(Progress::TYPE_PERCENT);
-
+        //~ Iterate on each char
         for ($i = 0; $i < $nbMax; $i++) {
-            $progress->display((string)$i, $i);
+            //~ We can have a potential header before have a periodicity, so keep n first char aside
             $header = substr($deltas, 0, $i);
 
+            //~ Then, search for a period of N elements (5 at least, 2k max here to accelerate process)
             for ($p = $minItems; $p < 2000; $p++) {
-                $periods = str_split(substr($deltas, $i + 1), $p);
-                array_pop($periods); // Skip last element that could have the wrong size
+                //~ Split deltas (minus header) into chunks of N elements
+                $periods = str_split(substr($deltas, $i), $p);
+
+                //~ Skip last element that could have the wrong size (aka tail)
+                array_pop($periods);
+
+                //~ Keep the first element for comparison to other
                 $first = array_shift($periods);
+
+                //~ For each other elements in chunk, compare with the first. If at least one is different, not a period
                 foreach ($periods as $period) {
                     if ($first !== $period) {
                         continue 2;
                     }
                 }
 
+                //~ All chunks are the same, so we found the period \o/. Then return header & and one period strings
                 return [$header, $first];
             }
         }
 
-        return [0, 0];
+        return ['0', '0'];
     }
 }
