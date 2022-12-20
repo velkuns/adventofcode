@@ -50,16 +50,24 @@ class Day16 extends Day
     private function getValveGraph(Graph $cave): ValveGraph
     {
         //~ Get only list of valve to open
+        /** @var ValveVertex[] $valvesToOpen */
         $valvesToOpen = array_filter($cave->getVertices(), fn (ValveVertex $vertex) => $vertex->getRate() > 0);
+
+        //~ Start with origin for puzzle
+        $origin       = $cave->getOrigin();
+        $valvesToOpen = [(string) $origin => $origin] + $valvesToOpen;
 
         $valves     = [];
         foreach ($valvesToOpen as $vertex) {
-            $valves[] = new ValveVertex((string) $vertex);
+            $valve = new ValveVertex((string) $vertex);
+            $valve->setRate($vertex->getRate());
+            $valves[] = $valve;
         }
 
         //~ Build new graph
         $valveGraph = new ValveGraph();
 
+        //~ Add edge between each vertex with weight equals to the real min length between vertices
         foreach ($valves as $index => $valve) {
             for ($i = 0; $i < count($valves); $i++) {
                 if ($i === $index) {
@@ -75,15 +83,17 @@ class Day16 extends Day
         return $valveGraph;
     }
 
+    /**
+     * 1809 too low
+     * @param array $inputs
+     * @return int
+     */
     protected function starOne(array $inputs): int
     {
         $cave       = $this->getCaveGraph($inputs);
-        $valveGraph = $this->getValveGraph($cave);
+        //$valveGraph = $this->getValveGraph($cave);
 
-        $allValves = $cave->getVertices();
-        $origin    = reset($allValves);
-
-        return $valveGraph->mostPressure($origin);
+        return $cave->mostPressure((string) $cave->getOrigin());
     }
 
     protected function starTwo(array $inputs): int

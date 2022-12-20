@@ -13,50 +13,73 @@ namespace Application\Graph;
 
 class ValveGraph extends Graph
 {
-    public function mostPressure(ValveVertex $origin): int
+    public function mostPressure(string $origin): int
     {
-        $queue  = new \SplQueue();
-        $minute = 0;
+        $visited = [];
+        foreach ($this->vertices as $vertex) {
+            $visited[(string) $vertex] = false;
+        }
 
-        $pressures[(string) $origin] = 0;
-        $visited[(string) $origin]   = true;
+        $visited[$origin] = true;
 
-        foreach ($origin->neighbors() as $neighbor) {
-            if (!isset($this->vertices[(string) $neighbor])) {
+        [$path, $mostPressures] = $this->visit($this->vertices[$origin], $visited, 0, 0, 1, 0, $origin);
+        //var_export([$path => $mostPressures]);
+        return $mostPressures;
+    }
+
+    private function visit(
+        ValveVertex $valve,
+        array $visited,
+        int $pressure,
+        int $totalPressure,
+        int $time,
+        int $pathLength,
+        string $parentPath
+    ): array|int {
+        $visited[(string) $valve] = true;
+
+        //~ Increase time + release pressure during moves
+        for ($l = 1; $l <= $pathLength; $l++) {
+            $time++;
+            $totalPressure += $pressure;
+
+            if ($time > 30) {
+                return [$parentPath, $totalPressure];
+            }
+        }
+
+        //~ Increase time for valve open
+        if ($valve->getRate()) {
+            $time++;
+            $totalPressure += $pressure;
+        }
+
+        $pressure += $valve->getRate(); // Open Valve
+
+        if ($time > 30) {
+            return [$parentPath, $totalPressure];
+        }
+
+        $pressures = [];
+        foreach ($this->edges[(string) $valve] as $edge) {
+            if ($visited[(string) $edge->to()] === true) {
                 continue;
             }
-            $this->edges[(string) $origin][(string) $neighbor] = new Edge($origin, $neighbor);
+
+            [$fullPath, $fullPressure] = $this->visit($edge->to(), $visited, $pressure, $totalPressure, $time, $edge->weight(), "$parentPath-{$edge->to()}");
+            $pressures[$fullPath]      = $fullPressure;
         }
 
-        $queue->push($origin);
-
-        // Breadth-first search Algorithm
-        while (!$queue->isEmpty() && $minute <= 30) {
-            $vertex = $queue->pop();
-            foreach ($this->edges[(string) $vertex] as $edge) {
-                $neighbor = $edge->to();
-                if (
-                    $visited[(string) $neighbor] === true &&
-                    ($pressures[(string) $neighbor] ?? 0) >= ($pressures[(string) $vertex] * $edge->weight())
-                ) {
-                    continue;
-                }
-
-                //~ Mark connected node a visited, set distance from origin & add predecessor
-                $visited[(string) $neighbor]      = true;
-                $pressures[(string) $neighbor]   += ($pressures[(string) $vertex] * $edge->weight());
-                $predecessors[(string) $neighbor] = $vertex;
-
-                //~ Enqueue connected node
-                $queue->push($neighbor);
-
-                //~ Destination reach, so stop
-                if ((string) $neighbor == (string) $destination) {
-                    return true;
-                }
+        if (empty($pressures)) {
+            for ($i = $time; $i <= 30; $i++) {
+                $totalPressure += $pressure;
             }
+            return [$parentPath, $totalPressure];
         }
 
-        return false;
+        $mostPressure = max($pressures);
+        $path         = array_search($mostPressure, $pressures);
+
+        return [$path, $mostPressure];
     }
 }

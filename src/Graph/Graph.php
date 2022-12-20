@@ -30,6 +30,11 @@ class Graph
         return $this;
     }
 
+    public function getOrigin(): Vertex
+    {
+        return reset($this->vertices);
+    }
+
     public function getVertices(): array
     {
         return $this->vertices;
@@ -111,5 +116,71 @@ class Graph
         }
 
         return false;
+    }
+    public function mostPressure(string $origin): int
+    {
+        $visited = [];
+        foreach ($this->vertices as $vertex) {
+            $visited[(string) $vertex] = false;
+        }
+
+        $visited[$origin] = true;
+
+        [$path, $mostPressures] = $this->visit($this->vertices[$origin], $visited, 0, 0, 1, $origin);
+        //var_export([$path => $mostPressures]);
+        return $mostPressures;
+    }
+
+    private function visit(
+        ValveVertex $valve,
+        array $visited,
+        int $pressure,
+        int $totalPressure,
+        int $time,
+        string $parentPath
+    ): array|int {
+        $visited[(string) $valve] = true;
+
+        $time++;
+
+        if ($time > 30) {
+            return [$parentPath, $totalPressure];
+        }
+
+        $totalPressure += $pressure;
+
+        //~ Increase time for valve open
+        if ($valve->getRate()) {
+            $time++;
+        }
+
+        if ($time > 30) {
+            return [$parentPath, $totalPressure];
+        }
+
+        $totalPressure += $pressure;
+        $pressure += $valve->getRate(); // Open Valve
+
+        $pressures = [];
+        foreach ($this->edges[(string) $valve] as $edge) {
+            if ($visited[(string) $edge->to()] === true) {
+                continue;
+            }
+
+            [$fullPath, $fullPressure] = $this->visit($edge->to(), $visited, $pressure, $totalPressure, $time, "$parentPath-{$edge->to()}");
+            $pressures[$fullPath]      = $fullPressure;
+        }
+
+        if (empty($pressures)) {
+            for ($i = $time; $i <= 30; $i++) {
+                $totalPressure += $pressure;
+            }
+            return [$parentPath, $totalPressure];
+        }
+
+        $mostPressure = max($pressures);
+        $path         = array_search($mostPressure, $pressures);
+
+        return [$path, $mostPressure];
     }
 }
